@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 
 import ChannelMessage from "../ChannelMessage";
 
-import { Container, Lookups, InputWrapper, Input, InputIcon, Mention } from "./styles";
+import { Container, Lookups, Mention } from "./styles";
 
 const ChannelData = () => {
     const messagesRef = useRef() as React.MutableRefObject<HTMLDivElement>;
@@ -33,6 +33,8 @@ const ChannelData = () => {
                         <>
                             <Mention>@Gabriel Shelby</Mention>,
                             terminando de
+                            eheyheye
+                            hahaha
                             comer aqui, já vou
                         </>
                     }

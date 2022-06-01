@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <React.StrictMode>
           <StyledEngineProvider injectFirst>
-            <App/>
+            <App pca={msalInstance}/>
           </StyledEngineProvider>
       </React.StrictMode>
     </BrowserRouter>

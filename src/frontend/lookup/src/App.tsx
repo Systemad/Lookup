@@ -26,27 +26,25 @@ import CssBaseline from '@mui/material/CssBaseline';
 type AppProps = {
   pca: IPublicClientApplication
 };
-import ResponsiveAppBar from "./features/app-bar/components";
 import Layout from "./components/Layout";
-import ServerList from "./components/ServerList";
-import ServerName from "./components/ServerName";
-import ChannelInfo from "./components/ChannelInfo";
-import ChannelList from "./components/ChannelList";
-import UserInfo from "./components/UserInfo";
 import {MainTheme} from "./features/themes/theme";
 // add msal
-function App() {
+function App({pca} : AppProps) {
 
-  //const history = useNavigate();
-  //const navigationClient = new CustomNavigationClient(history);
-  //pca.setNavigationClient(navigationClient);
+  const history = useNavigate();
+  const navigationClient = new CustomNavigationClient(history);
+  pca.setNavigationClient(navigationClient);
 
   return (
     <>
-        <ThemeProvider theme={MainTheme}>
-            <Pages/>
-            <GlobalStyles/>
-        </ThemeProvider>
+        <MsalProvider instance={pca}>
+            <ThemeProvider theme={MainTheme}>
+                <Provider store={store}>
+                    <Pages/>
+                </Provider>
+                <GlobalStyles/>
+            </ThemeProvider>
+        </MsalProvider>
     </>
   )
 }
@@ -64,12 +62,18 @@ export default App
 function Pages(){
   return (
       <>
-          <Grid>
-              <InteractionSidebarComponent/>
-              <Routes>
-                  <Route path="/" element={<Layout/>}/>
-              </Routes>
-          </Grid>
+          <AuthenticatedTemplate>
+                  <Grid>
+                      <InteractionSidebarComponent/>
+                      <Routes>
+                          <Route path="/" element={<Layout/>}/>
+                      </Routes>
+                  </Grid>
+          </AuthenticatedTemplate>
+
+          <UnauthenticatedTemplate>
+              <LoginDisplay/>
+          </UnauthenticatedTemplate>
       </>
   )
 }

@@ -19,8 +19,9 @@ export const Lookups = styled.div`
 
     // TODO: 50%, potential two side columns
     // When user clicks on tweet, make this width 50%, and open tweet + retweets in next side
-    // width: 50%;
+    max-width: 50%;
     max-height: calc(100vh - 46px);
+    // Remove scroll, make right bar permanent like left?  
     overflow-y: scroll;
   
     ::-webkit-scrollbar {
