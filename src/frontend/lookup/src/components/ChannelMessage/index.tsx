@@ -1,4 +1,6 @@
 import React from "react";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import RepeatIcon from '@mui/icons-material/Repeat';
 
 import {Container, Avatar, Message, Header, Content, LookupActionsContainer, LookupAction } from "./styles";
 export interface Props {
@@ -26,10 +28,10 @@ const ChannelMessage: React.FC<Props> = ({
             </Message>
             <LookupActionsContainer>
                 <LookupAction>
-                    <p>H</p>
+                    <FavoriteIcon color="primary"/>
                 </LookupAction>
                 <LookupAction>
-                    <p>H</p>
+                    <RepeatIcon/>
                 </LookupAction>
             </LookupActionsContainer>
         </Container>

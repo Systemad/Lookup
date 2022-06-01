@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 export const Container = styled.div`
     display: flex;
@@ -17,7 +18,7 @@ export const Container = styled.div`
     }
 
     &:hover {
-      background-color: mediumseagreen;
+      background-color: darksalmon;
       opacity: 1;
     }
   
