@@ -78,8 +78,11 @@ public class LookupAccount : Grain, ILookupAccount
 
     public async Task SetUsername(string username)
     {
-        _state.State.Username = username;
-        await _state.WriteStateAsync();
+        if (_state.State.Username == string.Empty)
+        {
+            _state.State.Username = username;
+            await _state.WriteStateAsync();   
+        }
     }
 
     public async Task FollowUserIdAsync(Guid userIdToFollow)
@@ -169,9 +172,9 @@ public class LookupAccount : Grain, ILookupAccount
         var followers = await GetFollowersListAsync();
         await notifier.SendBatchMessage(followers, message);
         // For now, just send to all followers
-        // but figure out obersvation, to when client connects, start observing active account and only get messages then
+        // but figure out observation, to when client connects, start observing active account and only get messages then
         // figure out how to modify other clients observers
-        //await notifier.SendBatchMessage(_viewers.ToList(), message);
+        // await notifier.SendBatchMessage(_viewers.ToList(), message);
         
         // This should only send to CURRENT USER
         //_viewers.ForEach(_ => _.NewLookup(message));

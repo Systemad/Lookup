@@ -2,7 +2,7 @@ namespace API.Extensions;
 
 public static class CorsServiceExtension
 {
-    public static IServiceCollection AddCorsService(this IServiceCollection service)
+    public static void AddCorsService(this IServiceCollection service)
     {
         service.AddCors(options =>
         {
@@ -10,12 +10,11 @@ public static class CorsServiceExtension
                 builder =>
                 {
                     builder.AllowAnyOrigin()
-                        .WithOrigins("https://localhost:44480")
+                        .WithOrigins("https://localhost:3000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
                 });
         });
-        return service;
     }
 }

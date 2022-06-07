@@ -24,12 +24,7 @@ public class LookupController : Controller
     {
         _grainFactory = grainFactory;
     }
-
-    // GET
-    public ActionResult Index()
-    {
-        return Ok();
-    }
+    
     /*
     *   Methods are for current user (me) 
     */
@@ -42,13 +37,40 @@ public class LookupController : Controller
         return Ok();
     }
     
-    [HttpGet("me/following", Name = "Get Followers Of Current User")]
+    [HttpGet("me/followers", Name = "Get Followers Of Current User")]
+    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetFollowersList()
+    {
+        var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        var followers = await user.GetFollowersListAsync();
+        return Ok(followers);
+    }
+    
+    [HttpGet("me/following", Name = "Get Followings Of Current User")]
     [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetFollowingList()
     {
         var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
         var followers = await user.GetFollowersListAsync();
         return Ok(followers);
+    }
+    
+    [HttpGet("me/messages", Name = "Get Recent received Lookups")]
+    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetReceivedMessages()
+    {
+        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        var messages = await lookupAccount.GetReceivedMessagesAsync();
+        return Ok(messages);
+    }
+
+    [HttpPost(Name = "Post Lookup")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> PostLookup([FromBody] CreateLookupModel model)
+    {
+        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        await lookupAccount.PublishMessageAsync(model.Content);
+        return Ok();
     }
     
     /* TODO: Not needed, as soon as user connects,

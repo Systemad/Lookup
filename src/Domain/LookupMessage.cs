@@ -8,3 +8,5 @@ public record class LookupMessage(
 {
     private Guid Id { get; set; } = Guid.NewGuid();
 }
+
+public record CreateLookupModel(string Content);

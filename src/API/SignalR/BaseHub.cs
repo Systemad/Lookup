@@ -15,9 +15,12 @@ public class BaseHub : Hub, IGrainObserver
     }
     
     private Guid GetUserId => new(Context.User.Claims.Single(e => e.Type == ClaimTypes.NameIdentifier).Value);
+    private string GetUsername => new(Context.User.Identity.Name);
 
     public override async Task OnConnectedAsync()
     {
+        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        await lookupAccount.SetUsername(GetUsername);
         await base.OnConnectedAsync();
     }
     
