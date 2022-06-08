@@ -1,5 +1,19 @@
 import { extendTheme } from '@chakra-ui/react';
 
+/*
+  css={{
+    '&::-webkit-scrollbar': {
+      width: '4px',
+    },
+    '&::-webkit-scrollbar-track': {
+      width: '6px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: scrollbarColor,
+      borderRadius: '24px',
+    },
+  }}
+ */
 export const theme = extendTheme({
     styles: {
       global: {
@@ -16,7 +30,18 @@ export const theme = extendTheme({
               border: '0',
               outline: '0',
               fontFamily: 'Roboto, sans-serif'
-        }
+        },
+          '&::-webkit-scrollbar': {
+              width: '4px'
+          },
+          '&::-webkit-scrollbar-track': {
+              backgroundColor: 'var(--secondary)'
+          },
+          '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'var(--tertiary)',
+              borderRadius: '4px',
+          },
+
       }
     }
 });

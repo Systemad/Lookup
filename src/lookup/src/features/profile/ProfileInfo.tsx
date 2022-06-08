@@ -1,7 +1,13 @@
 import React from "react";
-import {Box, chakra, Flex, useColorModeValue} from "@chakra-ui/react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
-
+import {
+    chakra,
+    Box,
+    Image,
+    Flex,
+    Icon,
+    useColorModeValue,
+} from "@chakra-ui/react";
+import { MdHeadset, MdEmail, MdLocationOn } from "react-icons/md";
 // replace with Lookup Account object
 type Props = {
     name: string;
@@ -14,26 +20,26 @@ const ProfileInfo = ({name, followers, following} : Props) => {
 
     return (
         <>
-        <Flex
-            alignItems="center"
-            justifyContent="space-between"
-            py={2}
-            px={3}
-            bg={useColorModeValue("gray.200", "gray.700")}
-        >
+            <Flex alignItems="center" justifyContent="space-between" px={6} py={3} bg="gray.900">
+                <Flex alignItems="center" justifyContent="space-between">
+                    <Icon as={MdHeadset} h={6} w={6} color="white" />
 
-            <chakra.h3
-                py={2}
-                textAlign="center"
-                fontWeight="bold"
-                textTransform="uppercase"
-                color={useColorModeValue("gray.800", "white")}
-                letterSpacing={1}
-            >
-                {name}
-            </chakra.h3>
+                    <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
+                        {name}
+                    </chakra.h1>
+                </Flex>
 
-        </Flex>
+                <Flex alignItems="center" justifyContent="space-between">
+                    <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
+                        Followers: 9999
+                    </chakra.h1>
+
+                    <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
+                        Following: 9999
+                    </chakra.h1>
+                </Flex>
+
+            </Flex>
         </>
     );
 };

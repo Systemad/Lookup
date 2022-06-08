@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
-import ChannelInfo from "../components/ChannelInfo";
-import UserList from "../components/UserList";
-import MainLookupFeed from "../components/ChannelData";
+import MainLookupFeed from "./lookups/Lookups";
 import {useAccount, useMsal} from "@azure/msal-react";
 import {loginRequest} from "./auth/utils/authConfig";
 import {AccountInfo} from "@azure/msal-browser";
