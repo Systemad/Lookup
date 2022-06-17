@@ -11,42 +11,91 @@ import {
 import { MdHeadset, MdEmail, MdLocationOn } from "react-icons/md";
 import { BsFillBriefcaseFill } from "react-icons/bs";
 
-const ProfileBio = () => {
+type Props = {
+    name: string,
+    bio?: string,
+    occupation?: string,
+    location?: string,
+    joinedDate?: string,
+}
+const ProfileBio = ({name, bio, occupation, location, joinedDate} : Props) => {
 
     return (
-
-        <Box py={4} px={6}>
-            <chakra.p py={2} color={useColorModeValue("gray.700", "gray.400")}>
-                Full Stack maker & UI / UX Designer , love hip hop music Author of
-                Building UI.
-            </chakra.p>
-
-            <Flex
-                alignItems="center"
-                mt={4}
-                color={useColorModeValue("gray.700", "gray.200")}
+        <Flex flexDirection="row">
+            <Box
+                w="sm"
+                bg={useColorModeValue("white", "gray.800")}
+                overflow="hidden"
+                justifyContent="left"
             >
-                <Icon as={BsFillBriefcaseFill} h={6} w={6} mr={2} />
+                <Image
+                    w="full"
+                    h={56}
+                    fit="cover"
+                    objectPosition="center"
+                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
+                    alt="avatar"
+                />
 
-                <chakra.h1 fontSize="sm" mr={2}>
-                    Choc UI
-                </chakra.h1>
+                <Flex alignItems="center" px={6} py={3} bg="gray.900">
+                    <Icon as={MdHeadset} h={6} w={6} color="white" />
 
-                <Icon as={MdLocationOn} h={6} w={6} mr={2} />
+                    <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
+                        Focusing
+                    </chakra.h1>
+                </Flex>
 
-                <chakra.h1 fontSize="sm" marginRight="2">
-                    California
-                </chakra.h1>
+                <Box py={4} px={6}>
+                    <chakra.h1
+                        fontSize="xl"
+                        fontWeight="bold"
+                        color={useColorModeValue("gray.800", "white")}
+                    >
+                        Patterson johnson
+                    </chakra.h1>
 
-                <Icon as={MdLocationOn} h={6} w={6} mr={2} />
+                    <chakra.p py={2} color={useColorModeValue("gray.700", "gray.400")}>
+                        Full Stack maker & UI / UX Designer , love hip hop music Author of
+                        Building UI.
+                    </chakra.p>
 
-                <chakra.h1 fontSize="sm" marginRight="2">
-                    California
-                </chakra.h1>
+                    <Flex
+                        alignItems="center"
+                        mt={4}
+                        color={useColorModeValue("gray.700", "gray.200")}
+                    >
+                        <Icon as={BsFillBriefcaseFill} h={6} w={6} mr={2} />
 
-            </Flex>
+                        <chakra.h1 px={2} fontSize="sm">
+                            Choc UI
+                        </chakra.h1>
+                    </Flex>
 
-        </Box>
+                    <Flex
+                        alignItems="center"
+                        mt={4}
+                        color={useColorModeValue("gray.700", "gray.200")}
+                    >
+                        <Icon as={MdLocationOn} h={6} w={6} mr={2} />
+
+                        <chakra.h1 px={2} fontSize="sm">
+                            California
+                        </chakra.h1>
+                    </Flex>
+                    <Flex
+                        alignItems="center"
+                        mt={4}
+                        color={useColorModeValue("gray.700", "gray.200")}
+                    >
+                        <Icon as={MdEmail} h={6} w={6} mr={2} />
+
+                        <chakra.h1 px={2} fontSize="sm">
+                            patterson@example.com
+                        </chakra.h1>
+                    </Flex>
+                </Box>
+            </Box>
+        </Flex>
     )
 }
 

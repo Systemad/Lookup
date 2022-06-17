@@ -22,8 +22,6 @@ const ProfileInfo = ({name, followers, following} : Props) => {
         <>
             <Flex alignItems="center" justifyContent="space-between" px={6} py={3} bg="gray.900">
                 <Flex alignItems="center" justifyContent="space-between">
-                    <Icon as={MdHeadset} h={6} w={6} color="white" />
-
                     <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
                         {name}
                     </chakra.h1>

@@ -4,18 +4,21 @@ using Orleans.Interfaces;
 namespace Orleans.Grains;
 
 [Serializable]
-public record class LookupAccountState
+public record LookupAccountState
 {
     public string Username { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; }
+    public string HeaderUrl { get; set; }
+    
     // List of publisher this user is following
-    public Dictionary<Guid, ILookupPublisher> Subscriptions { get; set; } = new();
+    public List<Guid> Followings { get; set; } = new();
     
     // List of subscribers that follows this user
-    public Dictionary<Guid, ILookupSubscriber> Followers { get; set; } = new();
+    public List<Guid> Followers { get; set; } = new();
+    
+    // Guids of Lookup messages recently received by this user
+    public List<Guid> RecentReceivedMessages { get; set; } = new();
 
-    // Lookup messages recently received by this user
-    public Queue<LookupMessage> RecentReceivedMessages { get; set; } = new();
-
-    // Lookup messages recently published by this user
-    public Queue<LookupMessage> MyPublishedMessages { get; set; } = new();
+    // Guids of Lookup messages recently published by this user
+    public List<Guid> MyPublishedMessages { get; set; } = new();
 }

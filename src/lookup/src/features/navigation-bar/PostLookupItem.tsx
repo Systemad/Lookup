@@ -1,4 +1,4 @@
-import {CreateLookupModel, useLookupPostLookupMutation} from "../../redux/webApi";
+import {CreateLookupModel, useLookupPostLookupMutation} from "../redux/webApi";
 import {
     Button,
     Flex,

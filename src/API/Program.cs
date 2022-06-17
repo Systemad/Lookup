@@ -11,6 +11,8 @@ using Orleans.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration["postgres"];
+
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -48,24 +50,43 @@ builder.Services.AddOpenApiServiceOath(builder.Configuration);
 
 // Due SignalR issues, we're co-hosting Orleans alongside the API.
 //builder.Services.AddOrleans();
-builder.Host.UseOrleans(silobuilder =>
+builder.Host.UseOrleans((context, silobuilder) =>
 {
-    silobuilder.UseLocalhostClustering();
     silobuilder.Configure<ClusterOptions>(options =>
     {
         options.ClusterId = "dev";
-        options.ServiceId = "lookup-service";
+        options.ServiceId = "lookupservice";
     });
+    if (context.HostingEnvironment.IsDevelopment())
+    {
+        silobuilder.UseLocalhostClustering();
+        silobuilder.AddMemoryGrainStorage("AccountState");
+        silobuilder.AddMemoryGrainStorage("GlobalState");
+    }
+    else
+    {
+        
+        silobuilder.UseAdoNetClustering(opt =>
+        {
+            opt.Invariant = "Npgsql";
+            opt.ConnectionString = connectionString;
+        });
+        silobuilder.AddAdoNetGrainStorageAsDefault(opt =>
+        {
+            opt.Invariant = "Npgsql";
+            opt.ConnectionString = connectionString;
+        });
+    }
     silobuilder.Configure<EndpointOptions>(options =>
     {
         options.AdvertisedIPAddress = IPAddress.Loopback;
     });
-    silobuilder.AddMemoryGrainStorage("AccountState");
     silobuilder.ConfigureLogging(
         log => log
             .AddFilter("Orleans.Runtime.Management.ManagementGrain", LogLevel.Warning)
             .AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning));
-    silobuilder.UseDashboard();
+    if(context.HostingEnvironment.IsDevelopment())
+        silobuilder.UseDashboard(); // Only use in development due being CPU intensive
 });
 
 var app = builder.Build();

@@ -6,10 +6,12 @@ namespace Orleans.Interfaces;
 // Grain
 public interface ILookupPublisher : IGrainWithGuidKey
 {
-    Task<ImmutableList<LookupMessage>> GetPublishedMessagesAsync(int n = 10, int start = 0);
+    Task<List<LookupMessage>> GetPublishedMessagesAsync(int n = 10, int start = 0);
 
-    Task AddFollowerAsync(Guid userId, ILookupSubscriber follower);
+    Task AddFollowerAsync(Guid userId);
     Task RemoveFollowerAsync(Guid userId);
 
     Task SetUsername(string username);
+
+    Task<User> GetUserInfo();
 }

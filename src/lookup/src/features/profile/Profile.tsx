@@ -8,10 +8,15 @@ import {
     Box,
     Flex,
     useColorModeValue,
+    Tabs
 } from "@chakra-ui/react";
 import ProfileBanner from "./ProfileBanner";
 import ProfileInfo from "./ProfileInfo";
 import ProfileBio from "./ProfileBio"
+import ProfileLookupsTabs from "./ProfileLookupsTabs"
+import ProfileLookups from "./ProfileLookups";
+
+
 const ProfilePage: React.FC = () => {
 
     const { instance, accounts, inProgress } = useMsal();
@@ -48,19 +53,25 @@ const ProfilePage: React.FC = () => {
                 mx="auto"
             >
                 <ProfileBanner headerUrl="https://images.unsplash.com/photo-1521903062400-b80f2cb8cb9d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1050&q=80"/>
-
                 <Box
                     w="full"
-                    bg={useColorModeValue("white", "gray.800")}
-                    mt={-10}
+                    mt={2}
                     shadow="lg"
                     overflow="hidden"
+                    justifyContent="space-between"
                 >
-                    <ProfileInfo name="Danova" followers="1212" following="2222"/>
-                    <ProfileBio/>
+                    <ProfileBio name="Random name" bio="Random bio" occupation="hey" location="hey" joinedDate="2022/06/09"/>
+                    <ProfileLookups/>
                 </Box>
             </Flex>
         </>
     );
 };
 export default ProfilePage;
+
+/*
+    bio?: string,
+    occupation?: string,
+    location?: string,
+    joinedDate?: string,
+ */

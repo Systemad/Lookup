@@ -1,2 +1,2 @@
-export * from "./InteractionSidebarComponent"
-export {default} from "./InteractionSidebarComponent"
+export * from "./InteractionBar"
+export {default} from "./InteractionBar"

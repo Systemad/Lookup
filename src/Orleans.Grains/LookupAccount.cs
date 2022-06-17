@@ -44,40 +44,46 @@ public class LookupAccount : Grain, ILookupAccount
     private static string GrainType => nameof(LookupAccount);
     private Guid GrainKey => this.GetPrimaryKey();
 
-    public override Task OnActivateAsync()
+    public override async Task OnActivateAsync()
     {
         _logger.LogInformation("{GrainType}: {GrainKey} activated", GrainType, GrainKey);
-        return Task.CompletedTask;
-        //await base.OnActivateAsync();
+        await _state.ReadStateAsync();
+        await base.OnActivateAsync();
     }
 
-    public Task<ImmutableList<LookupMessage>> GetPublishedMessagesAsync(int n = 10, int start = 0)
+    public async Task<List<LookupMessage>> GetPublishedMessagesAsync(int n = 10, int start = 0)
     {
         if (start < 0) start = 0;
         if (start + n > _state.State.MyPublishedMessages.Count) n = _state.State.MyPublishedMessages.Count - start;
-        
-        return Task.FromResult(
-            _state.State.MyPublishedMessages
-                .Skip(start)
-                .Take(n)
-                .ToImmutableList());
-    }
 
-    public async Task AddFollowerAsync(Guid userId, ILookupSubscriber follower)
+        var grain = GrainFactory.GetGrain<IGlobalGrain>(0);
+        var messages = await grain.GetLookupsFromUser(GrainKey);
+        
+        return messages;
+    }
+    
+    public async Task AddFollowerAsync(Guid userId)
     {
-        _state.State.Followers[userId] = follower;
+        if (_state.State.Followers.Contains(userId))
+            return;
+        
+        _state.State.Followers.Add(userId);
         await WriteStateAsync();
         // Notify new follower with signalR
     }
 
     public async Task RemoveFollowerAsync(Guid userId)
     {
+        if (_state.State.Followers.Contains(userId))
+            return;
+        
         _state.State.Followers.Remove(userId);
         await WriteStateAsync();
     }
 
     public async Task SetUsername(string username)
     {
+        // TODO: Better check
         if (_state.State.Username == string.Empty)
         {
             _state.State.Username = username;
@@ -85,54 +91,53 @@ public class LookupAccount : Grain, ILookupAccount
         }
     }
 
+    public Task<User> GetUserInfo()
+    {
+        var userInfo = new User(
+            _state.State.Username,
+            _state.State.AvatarUrl,
+            _state.State.HeaderUrl,
+            _state.State.Followers.Count,
+            _state.State.Followings.Count,
+            _state.State.MyPublishedMessages.Count);
+
+        return Task.FromResult(userInfo);
+    }
+
     public async Task FollowUserIdAsync(Guid userIdToFollow)
     {
-        var userToFollow = GrainFactory.GetGrain<ILookupPublisher>(userIdToFollow);
-        await userToFollow.AddFollowerAsync(GrainKey, this.AsReference<ILookupSubscriber>());
-        _state.State.Subscriptions[userIdToFollow] = userToFollow;
-        await WriteStateAsync();
+        if (_state.State.Followings.Contains(userIdToFollow))
+            return;
         
-        // notify with signalr
-        //_viewers.ForEach(_ => _.SubscriptionAdded(userIdToFollow));
+        _state.State.Followings.Add(userIdToFollow);
+        await WriteStateAsync();
+        var userToFollow = GrainFactory.GetGrain<ILookupPublisher>(userIdToFollow);
+        await userToFollow.AddFollowerAsync(GrainKey);
     }
 
     public async Task UnfollowUserIdAsync(Guid userIdToFollow)
     {
-        var userToFollow = GrainFactory.GetGrain<ILookupPublisher>(userIdToFollow);
-        await userToFollow.RemoveFollowerAsync(GrainKey);
-        _state.State.Subscriptions.Remove(userIdToFollow);
+        _state.State.Followings.Remove(userIdToFollow);
+        var userToUnFollow = GrainFactory.GetGrain<ILookupPublisher>(userIdToFollow);
+        await userToUnFollow.RemoveFollowerAsync(GrainKey);
         await WriteStateAsync();
-        
-        // notify with signalr
-        //_viewers.ForEach(_ => _.SubscriptionRemoved(userIdToFollow));
     }
 
-    public async Task PublishMessageAsync(string lookupMessage)
+    public async Task PublishMessageAsync(Guid id, string content, Guid? replyId)
     {
-        Console.WriteLine(lookupMessage);
-        var lookup = CreateNewLookupMessage(lookupMessage);
-        
-        _state.State.MyPublishedMessages.Enqueue(lookup);
-
-        while (_state.State.MyPublishedMessages.Count > PublishedMessagesCacheSize)
+        var ggrain = GrainFactory.GetGrain<IGlobalGrain>(0);
+        var lookup = CreateNewLookupMessage(id, content, replyId);
+        var exist = await ggrain.AddLookupAsync(lookup);
+        if (exist)
         {
-            _state.State.MyPublishedMessages.Dequeue();
+            var notifier = GrainFactory.GetGrain<IPushNotifierGrain>(0);
+            List<Guid> followers = new(_state.State.Followers);
+            followers.Add(GrainKey);
+            await notifier.SendBatchMessage(followers,lookup);   
         }
-
-        await WriteStateAsync();
-        
-        // This should only send to current user!
-        var notifier = GrainFactory.GetGrain<IPushNotifierGrain>(0);
-        await notifier.SendMessage(GrainKey,lookup);
-        
-        // TODO: Grab all _viewers ID, send message to each through a loop
-        //_viewers.ForEach(_ => _.NewLookup(lookup));
-
-        // Notify Followers
-        await Task.WhenAll(_state.State.Followers.Values.Select(_ => _.NewLookupAsync(lookup)).ToArray());
     }
-
-    public Task<ImmutableList<LookupMessage>> GetReceivedMessagesAsync(int n = 10, int start = 0)
+    
+    public async Task<List<LookupMessage>> GetReceivedMessagesAsync(int n = 10, int start = 0)
     {
         if (start < 0) start = 0;
         if (start + n > _state.State.RecentReceivedMessages.Count)
@@ -140,10 +145,12 @@ public class LookupAccount : Grain, ILookupAccount
             n = _state.State.RecentReceivedMessages.Count - start;
         }
 
-        return Task.FromResult(_state.State.RecentReceivedMessages
-            .Skip(start)
-            .Take(n)
-            .ToImmutableList());
+        // TODO: Figure out why its tracked
+        var ggrain = GrainFactory.GetGrain<IGlobalGrain>(0);
+        List<Guid> followings = new(_state.State.Followings);
+        followings.Add(GrainKey);
+        var messages = await ggrain.GetLookupsFromFollowings(followings);
+        return messages;
     }
 
     public Task SubscribeAsync(Guid viewerId)
@@ -157,38 +164,51 @@ public class LookupAccount : Grain, ILookupAccount
         _viewers.Remove(viewerId);
         return Task.CompletedTask;
     }
-    
-    public async Task NewLookupAsync(LookupMessage message)
+
+    public async Task<List<User>> GetFollowingListAsync()
     {
-        _state.State.RecentReceivedMessages.Enqueue(message);
-        while (_state.State.RecentReceivedMessages.Count > PublishedMessagesCacheSize)
-        {
-            _state.State.MyPublishedMessages.Dequeue();
-        }
+        List<User> users = new List<User>();
+        await Parallel.ForEachAsync(_state.State.Followings,
+            async (id, _) =>
+            {
+                var userGrain = GrainFactory.GetGrain<ILookupPublisher>(id);
+                var userInfo = await userGrain.GetUserInfo();
+                users.Add(userInfo);
+            });
 
-        await WriteStateAsync();
+        return users;
+    }
+    
+    public async Task<List<User>> GetFollowersListAsync()
+    {
+        List<User> users = new List<User>();
+        await Parallel.ForEachAsync(_state.State.Followers,
+            async (id, _) =>
+            {
+                var userGrain = GrainFactory.GetGrain<ILookupPublisher>(id);
+                var userInfo = await userGrain.GetUserInfo();
+                users.Add(userInfo);
+            });
 
-        var notifier = GrainFactory.GetGrain<IPushNotifierGrain>(0);
-        var followers = await GetFollowersListAsync();
-        await notifier.SendBatchMessage(followers, message);
-        // For now, just send to all followers
-        // but figure out observation, to when client connects, start observing active account and only get messages then
-        // figure out how to modify other clients observers
-        // await notifier.SendBatchMessage(_viewers.ToList(), message);
-        
-        // This should only send to CURRENT USER
-        //_viewers.ForEach(_ => _.NewLookup(message));
+        return users;
     }
 
-    
-    public Task<ImmutableList<Guid>> GetFollowingListAsync() 
-        => Task.FromResult(_state.State.Subscriptions.Keys.ToImmutableList());
-
-    public Task<ImmutableList<Guid>> GetFollowersListAsync()
-        => Task.FromResult(_state.State.Followers.Keys.ToImmutableList());
-    
-    private LookupMessage CreateNewLookupMessage(string message)
-        => new(message, DateTimeOffset.Now, _state.State.Username);
+    private LookupMessage CreateNewLookupMessage(Guid id, string content, Guid? replyId)
+    {
+        var newObject = new LookupMessage
+        {
+            Id = id,
+            Content = content,
+            PublisherUserId = GrainKey,
+            PublisherUsername = _state.State.Username,
+            Timestamp = DateTimeOffset.Now,
+            Likes = 0,
+            Edited = false,
+            ReplyId = replyId,
+            EditedTimetamp = null
+        };
+        return newObject;
+    }
 
     private async Task WriteStateAsync()
     {

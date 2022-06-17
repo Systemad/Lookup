@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Domain;
 using Microsoft.AspNetCore.SignalR;
 using Orleans;
 using Orleans.Interfaces;
@@ -19,14 +20,15 @@ public class BaseHub : Hub, IGrainObserver
 
     public override async Task OnConnectedAsync()
     {
+        Console.WriteLine("Connected");
         var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
         await lookupAccount.SetUsername(GetUsername);
         await base.OnConnectedAsync();
     }
-    
-    public async Task NewLookupMethod(Guid userId, string message)
+
+    public async Task NewLookupMethod(Guid userId, CreateLookupModel model)
     {
         var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(userId);
-        await lookupAccount.PublishMessageAsync(message);
+        await lookupAccount.PublishMessageAsync(Guid.NewGuid(), model.Content, model.ReplyId);
     }
 }

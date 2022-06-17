@@ -15,13 +15,14 @@ import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import {LoginDisplay} from "./features/auth/components/LoginDisplay/LoginDisplay";
 import { store} from "./features/redux/store";
 import { Provider } from 'react-redux'
-import InteractionSidebarComponent from "./features/interaction-sidebar"
+import NavigationBarComponent from "./features/navigation-bar"
 import GlobalStyles from "./GlobalStyles";
 type AppProps = {
   pca: IPublicClientApplication
 };
 import HomePage from "./features/home";
 import ProfilePage from "./features/profile/Profile";
+import InteractionBar from "./features/interaction-sidebar";
 function App({pca} : AppProps) {
 
   const history = useNavigate();
@@ -50,8 +51,6 @@ function Pages(){
               <Grid
                   display='grid'
                   templateAreas={`
-                  "sidebar main"
-                  "sidebar main"
                   "sidebar main"`}
                   gridTemplateRows={'auto'}
                   gridTemplateColumns={'200px auto'}
@@ -61,7 +60,7 @@ function Pages(){
               >
 
                   <GridItem area={'sidebar'}>
-                      <InteractionSidebarComponent/>
+                      <NavigationBarComponent/>
                   </GridItem>
 
                   <GridItem pl='2' area={'main'}>
@@ -80,12 +79,3 @@ function Pages(){
       </>
   )
 }
-
-/*
-    PN - Page name
-    PI - Page info
-    NB - Navigation bar
-    UI - User info
-    UL - User list
-    MF - Main feed
- */

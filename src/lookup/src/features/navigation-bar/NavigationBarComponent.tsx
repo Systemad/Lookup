@@ -3,9 +3,9 @@ import {
     Box,
     useColorModeValue,
 } from '@chakra-ui/react'
-import BaseBar from "./sidebar-content/BaseBar";
+import BaseBar from "./BaseBar";
 
-export const InteractionSidebarComponent = () => {
+export const NavigationBarComponent = () => {
 
     return (
         <>
@@ -21,4 +21,4 @@ export const InteractionSidebarComponent = () => {
     )
 }
 
-export default InteractionSidebarComponent;
+export default NavigationBarComponent;

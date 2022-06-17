@@ -36,7 +36,7 @@ public class PushNotifierGrain : Grain, IPushNotifierGrain
         await _baseHub.Clients.User(userId.ToString()).SendAsync("lookupReceived", message);
     }
 
-    public async Task SendBatchMessage(ImmutableList<Guid> viewers, LookupMessage message)
+    public async Task SendBatchMessage(List<Guid> viewers, LookupMessage message)
     {
         foreach (var viewer in viewers)
         {

@@ -28,7 +28,7 @@ public class LookupController : Controller
     /*
     *   Methods are for current user (me) 
     */
-    [HttpPost("me/follow/{userToFollowId}", Name = "Follow user")]
+    [HttpPost("me/follow/{userToFollowId:guid}", Name = "Follow user")]
     //[ProducesResponseType()]
     public async Task<IActionResult> FollowUser([FromRoute] Guid userToFollowId)
     {
@@ -66,10 +66,22 @@ public class LookupController : Controller
 
     [HttpPost(Name = "Post Lookup")]
     [Consumes("application/json")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
     public async Task<IActionResult> PostLookup([FromBody] CreateLookupModel model)
     {
+        var id = Guid.NewGuid();
         var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        await lookupAccount.PublishMessageAsync(model.Content);
+        await lookupAccount.PublishMessageAsync(id, model.Content, model.ReplyId);
+        return Ok();
+    }
+    
+    [HttpPost("edit/{id:guid}", Name = "Edit Lookup")]
+    [Consumes("application/json")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    public async Task<IActionResult> EditLookup([FromRoute] Guid id, [FromBody] EditLookupModel model)
+    {
+        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        await lookupAccount.PublishMessageAsync(id, model.Content);
         return Ok();
     }
     

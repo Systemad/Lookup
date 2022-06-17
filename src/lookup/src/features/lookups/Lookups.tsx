@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 
-import ChannelMessage from "../../components/ChannelMessage";
-import { Flex, Spacer } from '@chakra-ui/react'
+import LookupItem from "./LookupItem";
+import { Flex, chakra, Spacer, Heading } from '@chakra-ui/react'
 import styled from "styled-components";
 import {useLookupGetReceivedMessagesQuery} from "../redux/webApi";
 
@@ -25,76 +25,19 @@ const MainLookupFeed = () => {
 
     return (
         <>
-        <Flex justify="space-between" direction="column" bg="var(--primary)">
-            <Flex flexDirection="column" maxW="55%" maxH="100vh" overflowY="scroll" ref={messagesRef}>
-                {messages?.map((message) => (
-                    <ChannelMessage
-                        author={message?.publisherUsername}
-                        date={message?.timestamp}
-                        content={message?.content}
-                    />
+            <Flex justify="space-between" bg="var(--primary)">
+                <Flex flexDirection="column" w="55%" maxW="55%" maxH="100vh" overflowY="scroll" ref={messagesRef}>
+                    {messages?.map((message) => (
+                        <LookupItem
+                            author={message?.publisherUsername}
+                            date={message?.timestamp}
+                            likeCount={message?.likes}
+                            content={message?.content}
 
-                ))}
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
-                <ChannelMessage
-                    author="hey"
-                    date="today"
-                    content="random content hello tweeet"
-                />
+                        />
+
+                    ))}
+
                 </Flex>
             </Flex>
         </>

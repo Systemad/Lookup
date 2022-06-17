@@ -27,11 +27,11 @@ const HomePage: React.FC = () => {
         if(connection.state === signalR.HubConnectionState.Disconnected)
             await connection.start();
     }
-    /*
+
     useEffect(() => {
         startConnection().then(r => console.log(r));
     }, []);
-    */
+
     return (
         <>
             <MainLookupFeed />

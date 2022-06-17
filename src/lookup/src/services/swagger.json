@@ -154,15 +154,49 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lookup/edit/{id}": {
+      "post": {
+        "tags": [
+          "Lookup"
+        ],
+        "operationId": "Lookup_EditLookup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditLookupModel"
               }
             }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "security": [
@@ -204,19 +238,61 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
           "content": {
+            "type": "string"
+          },
+          "publisherUserId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "publisherUsername": {
             "type": "string"
           },
           "timestamp": {
             "type": "string",
             "format": "date-time"
           },
-          "publisherUsername": {
-            "type": "string"
+          "likes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "edited": {
+            "type": "boolean"
+          },
+          "replyId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "editedTimetamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         }
       },
       "CreateLookupModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "edited": {
+            "type": "boolean"
+          },
+          "replyId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "EditLookupModel": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

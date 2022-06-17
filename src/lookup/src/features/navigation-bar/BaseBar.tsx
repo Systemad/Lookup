@@ -11,7 +11,7 @@ import {
     Textarea
 } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import {useLookupPostLookupMutation, CreateLookupModel} from "../../redux/webApi";
+import {useLookupPostLookupMutation, CreateLookupModel} from "../redux/webApi";
 import NavBarItem from "./NavBarItem";
 import PostLookupItem from "./PostLookupItem";
 
