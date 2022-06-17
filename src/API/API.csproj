@@ -53,4 +53,9 @@
       <ProjectReference Include="..\Orleans.Interfaces\Orleans.Interfaces.csproj" />
     </ItemGroup>
 
+    <Target Name="ZipPublishOutput" AfterTargets="Publish">
+        <Delete Files="$(ProjectDir)\..\api.zip" />
+        <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ProjectDir)\..\api.zip" />
+    </Target>
+
 </Project>
