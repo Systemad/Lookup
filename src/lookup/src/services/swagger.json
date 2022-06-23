@@ -12,15 +12,15 @@
     }
   ],
   "paths": {
-    "/api/v1/lookup/me/follow/{userToFollowId}": {
-      "post": {
+    "/api/v1/lookup/{id}": {
+      "get": {
         "tags": [
           "Lookup"
         ],
-        "operationId": "Lookup_FollowUser",
+        "operationId": "Lookup_GetLookup",
         "parameters": [
           {
-            "name": "userToFollowId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -30,98 +30,25 @@
             "x-position": 1
           }
         ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
+        "requestBody": {
+          "x-name": "reply",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "boolean"
               }
             }
-          }
+          },
+          "required": true,
+          "x-position": 2
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/lookup/me/followers": {
-      "get": {
-        "tags": [
-          "Lookup"
-        ],
-        "operationId": "Lookup_GetFollowersList",
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LookupMessage"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/lookup/me/following": {
-      "get": {
-        "tags": [
-          "Lookup"
-        ],
-        "operationId": "Lookup_GetFollowingList",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LookupMessage"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/lookup/me/messages": {
-      "get": {
-        "tags": [
-          "Lookup"
-        ],
-        "operationId": "Lookup_GetReceivedMessages",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LookupMessage"
-                  }
+                  "$ref": "#/components/schemas/LookupMessage"
                 }
               }
             }
@@ -197,6 +124,293 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lookup/{userId}/messages": {
+      "get": {
+        "tags": [
+          "Lookup"
+        ],
+        "operationId": "Lookup_GetMessagesFromUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LookupMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/lookup/{lookupId}/thread": {
+      "get": {
+        "tags": [
+          "Lookup"
+        ],
+        "operationId": "Lookup_GetMessageThread",
+        "parameters": [
+          {
+            "name": "lookupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LookupMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/{userId}/followers": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetFollowersList",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/userid:guid/following": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetFollowingList",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/{userId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetUserInfo",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/me/follow/{userToFollowId}": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_FollowUser",
+        "parameters": [
+          {
+            "name": "userToFollowId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/me/messages": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetReceivedMessages",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LookupMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/user/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "User_GetMeInfo",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -298,6 +512,43 @@
         "properties": {
           "content": {
             "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "headerUrl": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "joinedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "followersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "followingCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lookupsCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

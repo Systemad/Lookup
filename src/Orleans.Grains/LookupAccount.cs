@@ -47,7 +47,7 @@ public class LookupAccount : Grain, ILookupAccount
     public override async Task OnActivateAsync()
     {
         _logger.LogInformation("{GrainType}: {GrainKey} activated", GrainType, GrainKey);
-        await _state.ReadStateAsync();
+        await Init();
         await base.OnActivateAsync();
     }
 
@@ -97,6 +97,9 @@ public class LookupAccount : Grain, ILookupAccount
             _state.State.Username,
             _state.State.AvatarUrl,
             _state.State.HeaderUrl,
+            _state.State.Bio,
+            _state.State.Location,
+            _state.State.JoinedDate,
             _state.State.Followers.Count,
             _state.State.Followings.Count,
             _state.State.MyPublishedMessages.Count);
@@ -169,6 +172,7 @@ public class LookupAccount : Grain, ILookupAccount
     {
         List<User> users = new List<User>();
         await Parallel.ForEachAsync(_state.State.Followings,
+            new ParallelOptions { TaskScheduler = TaskScheduler.Current },
             async (id, _) =>
             {
                 var userGrain = GrainFactory.GetGrain<ILookupPublisher>(id);
@@ -183,6 +187,7 @@ public class LookupAccount : Grain, ILookupAccount
     {
         List<User> users = new List<User>();
         await Parallel.ForEachAsync(_state.State.Followers,
+            new ParallelOptions { TaskScheduler = TaskScheduler.Current },
             async (id, _) =>
             {
                 var userGrain = GrainFactory.GetGrain<ILookupPublisher>(id);
@@ -210,6 +215,17 @@ public class LookupAccount : Grain, ILookupAccount
         return newObject;
     }
 
+    private async Task Init()
+    {
+        _logger.LogInformation("Initializing grain: {GrainKey}", GrainKey);
+        await _state.ReadStateAsync();
+        var exist = await Task.FromResult(_state.RecordExists);
+        if (!exist)
+        {
+            _state.State.JoinedDate = DateTimeOffset.Now;
+            await WriteStateAsync();
+        }
+    }
     private async Task WriteStateAsync()
     {
         if (_outstandingWriteStateOperation is Task currentWriteStateOperation)

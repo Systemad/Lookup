@@ -3,7 +3,6 @@ using Domain;
 
 namespace Orleans.Interfaces;
 
-// Grain
 public interface ILookupPublisher : IGrainWithGuidKey
 {
     Task<List<LookupMessage>> GetPublishedMessagesAsync(int n = 10, int start = 0);

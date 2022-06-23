@@ -5,21 +5,20 @@ import {AccountInfo} from "@azure/msal-browser";
 import connection from "../../services/signalr";
 import * as signalR from "@microsoft/signalr"
 import {
-    Box,
     Flex,
-    useColorModeValue,
-    Tabs
+    Stack
 } from "@chakra-ui/react";
 import ProfileBanner from "./ProfileBanner";
-import ProfileInfo from "./ProfileInfo";
 import ProfileBio from "./ProfileBio"
-import ProfileLookupsTabs from "./ProfileLookupsTabs"
 import ProfileLookups from "./ProfileLookups";
-
+import {useUserGetUserInfoQuery} from "../redux/webApi";
+import {useLocation} from "react-router-dom";
 
 const ProfilePage: React.FC = () => {
 
     const { instance, accounts, inProgress } = useMsal();
+    const { pathname } = useLocation();
+    const  {data: user} = useUserGetUserInfoQuery({userId: pathname.toString()})
 
     const tokenRequest = {
         account: instance.getActiveAccount() as AccountInfo,
@@ -38,40 +37,21 @@ const ProfilePage: React.FC = () => {
         if(connection.state === signalR.HubConnectionState.Disconnected)
             await connection.start();
     }
-    /*
+
     useEffect(() => {
         startConnection().then(r => console.log(r));
     }, []);
-    */
+
     return (
         <>
-            <Flex
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                w="100%"
-                mx="auto"
-            >
-                <ProfileBanner headerUrl="https://images.unsplash.com/photo-1521903062400-b80f2cb8cb9d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1050&q=80"/>
-                <Box
-                    w="full"
-                    mt={2}
-                    shadow="lg"
-                    overflow="hidden"
-                    justifyContent="space-between"
-                >
-                    <ProfileBio name="Random name" bio="Random bio" occupation="hey" location="hey" joinedDate="2022/06/09"/>
+            <Flex direction="column" w="full" mx="auto">
+                <ProfileBanner headerUrl={user?.headerUrl}/>
+                <Stack direction={['column', 'row']}>
+                    <ProfileBio name={user?.username} bio={user?.bio} location={user?.location} joinedDate={user?.joinedDate}/>
                     <ProfileLookups/>
-                </Box>
+                </Stack>
             </Flex>
         </>
     );
 };
 export default ProfilePage;
-
-/*
-    bio?: string,
-    occupation?: string,
-    location?: string,
-    joinedDate?: string,
- */

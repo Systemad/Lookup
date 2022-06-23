@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { SignInButton } from "./SignInButton";
 import { InteractionStatus } from "@azure/msal-browser";

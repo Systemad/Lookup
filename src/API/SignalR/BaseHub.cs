@@ -1,12 +1,14 @@
 ﻿using System.Security.Claims;
 using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Orleans;
 using Orleans.Interfaces;
 
 namespace API.SignalR;
 
-public class BaseHub : Hub, IGrainObserver
+[Authorize]
+public class BaseHub : Hub
 {
     private readonly IGrainFactory _grainFactory;
 
@@ -20,8 +22,7 @@ public class BaseHub : Hub, IGrainObserver
 
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine("Connected");
-        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
+        var lookupAccount = _grainFactory.GetGrain<ILookupPublisher>(GetUserId);
         await lookupAccount.SetUsername(GetUsername);
         await base.OnConnectedAsync();
     }

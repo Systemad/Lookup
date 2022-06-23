@@ -1,4 +1,4 @@
-import React from "React";
+import React from "react";
 import {
     chakra,
     Box,
@@ -12,51 +12,37 @@ import { MdHeadset, MdEmail, MdLocationOn } from "react-icons/md";
 import { BsFillBriefcaseFill } from "react-icons/bs";
 
 type Props = {
-    name: string,
+    name?: string,
     bio?: string,
-    occupation?: string,
     location?: string,
     joinedDate?: string,
+    avatarUrl?: string
 }
-const ProfileBio = ({name, bio, occupation, location, joinedDate} : Props) => {
-
+const ProfileBio = ({name, bio, occupation, location, joinedDate, avatarUrl} : Props) => {
     return (
-        <Flex flexDirection="row">
             <Box
                 w="sm"
                 bg={useColorModeValue("white", "gray.800")}
                 overflow="hidden"
-                justifyContent="left"
             >
                 <Image
                     w="full"
                     h={56}
                     fit="cover"
                     objectPosition="center"
-                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
+                    src={avatarUrl}
                     alt="avatar"
                 />
 
                 <Flex alignItems="center" px={6} py={3} bg="gray.900">
-                    <Icon as={MdHeadset} h={6} w={6} color="white" />
-
                     <chakra.h1 mx={3} color="white" fontWeight="bold" fontSize="lg">
-                        Focusing
+                        {name}
                     </chakra.h1>
                 </Flex>
 
                 <Box py={4} px={6}>
-                    <chakra.h1
-                        fontSize="xl"
-                        fontWeight="bold"
-                        color={useColorModeValue("gray.800", "white")}
-                    >
-                        Patterson johnson
-                    </chakra.h1>
-
                     <chakra.p py={2} color={useColorModeValue("gray.700", "gray.400")}>
-                        Full Stack maker & UI / UX Designer , love hip hop music Author of
-                        Building UI.
+                        {bio}
                     </chakra.p>
 
                     <Flex
@@ -67,7 +53,7 @@ const ProfileBio = ({name, bio, occupation, location, joinedDate} : Props) => {
                         <Icon as={BsFillBriefcaseFill} h={6} w={6} mr={2} />
 
                         <chakra.h1 px={2} fontSize="sm">
-                            Choc UI
+                            TODO
                         </chakra.h1>
                     </Flex>
 
@@ -79,7 +65,7 @@ const ProfileBio = ({name, bio, occupation, location, joinedDate} : Props) => {
                         <Icon as={MdLocationOn} h={6} w={6} mr={2} />
 
                         <chakra.h1 px={2} fontSize="sm">
-                            California
+                            {location}
                         </chakra.h1>
                     </Flex>
                     <Flex
@@ -90,12 +76,11 @@ const ProfileBio = ({name, bio, occupation, location, joinedDate} : Props) => {
                         <Icon as={MdEmail} h={6} w={6} mr={2} />
 
                         <chakra.h1 px={2} fontSize="sm">
-                            patterson@example.com
+                            {joinedDate}
                         </chakra.h1>
                     </Flex>
                 </Box>
             </Box>
-        </Flex>
     )
 }
 

@@ -1,16 +1,15 @@
-import React from "React";
-import {Flex, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+import React from "react";
+import {Flex, Box, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 const ProfileLookupsTabs = () => {
     return (
         <>
-
-            <Flex justifyContent="right" w="full" flexDirection="row">
-                <Tabs>
+        <Box w="full">
+                <Tabs defaultIndex={0} variant='soft-rounded' colorScheme='green' align="center" isFitted isLazy>
                     <TabList>
-                        <Tab>One</Tab>
-                        <Tab>Two</Tab>
-                        <Tab>Three</Tab>
+                        <Tab>Lookups</Tab>
+                        <Tab>Likes</Tab>
+                        <Tab isDisabled>Reposts</Tab>
                     </TabList>
 
                     <TabPanels>
@@ -25,7 +24,7 @@ const ProfileLookupsTabs = () => {
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
-            </Flex>
+        </Box>
         </>
     );
 };

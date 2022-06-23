@@ -25,43 +25,13 @@ public class LookupController : Controller
         _grainFactory = grainFactory;
     }
     
-    /*
-    *   Methods are for current user (me) 
-    */
-    [HttpPost("me/follow/{userToFollowId:guid}", Name = "Follow user")]
-    //[ProducesResponseType()]
-    public async Task<IActionResult> FollowUser([FromRoute] Guid userToFollowId)
+    [HttpGet("{id:guid}", Name = "Get Lookup")]
+    [ProducesResponseType(typeof(LookupMessage), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetLookup([FromRoute] Guid id, [FromBody] bool reply)
     {
-        var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        await user.FollowUserIdAsync(userToFollowId);
-        return Ok();
-    }
-    
-    [HttpGet("me/followers", Name = "Get Followers Of Current User")]
-    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GetFollowersList()
-    {
-        var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        var followers = await user.GetFollowersListAsync();
-        return Ok(followers);
-    }
-    
-    [HttpGet("me/following", Name = "Get Followings Of Current User")]
-    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GetFollowingList()
-    {
-        var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        var followers = await user.GetFollowersListAsync();
-        return Ok(followers);
-    }
-    
-    [HttpGet("me/messages", Name = "Get Recent received Lookups")]
-    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GetReceivedMessages()
-    {
-        var lookupAccount = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        var messages = await lookupAccount.GetReceivedMessagesAsync();
-        return Ok(messages);
+        var globalGrain = _grainFactory.GetGrain<IGlobalGrain>(0);
+        var lookup = await globalGrain.GetLookupMessage(id, reply);
+        return Ok(lookup);
     }
 
     [HttpPost(Name = "Post Lookup")]
@@ -85,18 +55,23 @@ public class LookupController : Controller
         return Ok();
     }
     
-    /* TODO: Not needed, as soon as user connects,
-     In the hub, grab all followers, the add them to viewers for that logged in user
-    [HttpGet("me/observe/{userIdToObserve}", Name = "Get Followers Of Current User")]
+    [HttpGet("{userId:guid}/messages", Name = "Get Lookups from specific user")]
     [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> ObserveUser(Guid userIdToObserve)
+    public async Task<IActionResult> GetMessagesFromUser([FromRoute] Guid userId)
     {
-        var user = _grainFactory.GetGrain<ILookupAccount>(GetUserId);
-        await user.SubscribeAsync(userIdToObserve);
-        return Ok();
+        var globalGrain = _grainFactory.GetGrain<IGlobalGrain>(0);
+        var messages = await globalGrain.GetLookupsFromUser(userId);
+        var sortedMessages = messages.OrderByDescending(time => time.Timestamp).Reverse();
+        return Ok(sortedMessages);
     }
-    */
-    /*
-    *   Methods are for specific user specified with route
-    */
+    
+    [HttpGet("{lookupId:guid}/thread", Name = "Get Lookup thread")]
+    [ProducesResponseType(typeof(IEnumerable<LookupMessage>), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> GetMessageThread([FromRoute] Guid lookupId)
+    {
+        var globalGrain = _grainFactory.GetGrain<IGlobalGrain>(0);
+        var messages = await globalGrain.GetLookupThread(lookupId);
+        var sortedMessages = messages.OrderByDescending(time => time.Timestamp).Reverse();
+        return Ok(sortedMessages);
+    }
 }

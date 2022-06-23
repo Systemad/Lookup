@@ -1,4 +1,4 @@
-import React from "React";
+import React from "react";
 import {Flex, Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 export type Props = {

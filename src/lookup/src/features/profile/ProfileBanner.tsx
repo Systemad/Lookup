@@ -9,9 +9,8 @@ const ProfileBanner = ({headerUrl} : props) => {
     return (
                 <Box
                     bg="gray.300"
-                    h={64}
+                    h={60}
                     w="full"
-                    rounded="lg"
                     shadow="md"
                     bgSize="cover"
                     bgPos="center"

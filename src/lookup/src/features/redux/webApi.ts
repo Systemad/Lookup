@@ -2,55 +2,14 @@ import { emptySplitApi as api } from "./emptyApi";
 import connection from "../../services/signalr";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
-    lookupFollowUser: build.mutation<
-      LookupFollowUserApiResponse,
-      LookupFollowUserApiArg
+    lookupGetLookup: build.query<
+      LookupGetLookupApiResponse,
+      LookupGetLookupApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/v1/lookup/me/follow/${queryArg.userToFollowId}`,
-        method: "POST",
+        url: `/api/v1/lookup/${queryArg.id}`,
+        body: queryArg.body,
       }),
-    }),
-    lookupGetFollowersList: build.query<
-      LookupGetFollowersListApiResponse,
-      LookupGetFollowersListApiArg
-    >({
-      query: () => ({ url: `/api/v1/lookup/me/followers` }),
-    }),
-    lookupGetFollowingList: build.query<
-      LookupGetFollowingListApiResponse,
-      LookupGetFollowingListApiArg
-    >({
-      query: () => ({ url: `/api/v1/lookup/me/following` }),
-    }),
-    lookupGetReceivedMessages: build.query<
-      LookupGetReceivedMessagesApiResponse,
-      LookupGetReceivedMessagesApiArg
-    >({
-      query: () => ({ url: `/api/v1/lookup/me/messages` }),
-      async onCacheEntryAdded(args,
-                              {cacheDataLoaded, cacheEntryRemoved, updateCachedData},
-      ){
-        try {
-          await cacheDataLoaded;
-          connection.on("lookupReceived", (message: LookupMessage) => {
-            console.log(message.content)
-            updateCachedData((draft) => {
-              /* For editing lookups
-              const index = draft.findIndex(msg => msg.id == message.id);
-              if(index > -1) {
-                draft[index] = message;
-              } else {
-                draft.push(message);
-              }
-              */
-              draft.push(message);
-            })
-          })
-        } catch {
-
-        }
-      }
     }),
     lookupPostLookup: build.mutation<
       LookupPostLookupApiResponse,
@@ -72,6 +31,78 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.editLookupModel,
       }),
     }),
+    lookupGetMessagesFromUser: build.query<
+      LookupGetMessagesFromUserApiResponse,
+      LookupGetMessagesFromUserApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/lookup/${queryArg.userId}/messages`,
+      }),
+    }),
+    lookupGetMessageThread: build.query<
+      LookupGetMessageThreadApiResponse,
+      LookupGetMessageThreadApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/lookup/${queryArg.lookupId}/thread`,
+      }),
+    }),
+    userGetFollowersList: build.query<
+      UserGetFollowersListApiResponse,
+      UserGetFollowersListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/user/${queryArg.userId}/followers`,
+      }),
+    }),
+    userGetFollowingList: build.query<
+      UserGetFollowingListApiResponse,
+      UserGetFollowingListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/user/userid:guid/following`,
+        params: { userId: queryArg.userId },
+      }),
+    }),
+    userGetUserInfo: build.query<
+      UserGetUserInfoApiResponse,
+      UserGetUserInfoApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/v1/user/${queryArg.userId}` }),
+    }),
+    userFollowUser: build.mutation<
+      UserFollowUserApiResponse,
+      UserFollowUserApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/v1/user/me/follow/${queryArg.userToFollowId}`,
+        method: "POST",
+      }),
+    }),
+    userGetReceivedMessages: build.query<
+      UserGetReceivedMessagesApiResponse,
+      UserGetReceivedMessagesApiArg
+    >({
+      query: () => ({ url: `/api/v1/user/me/messages` }),
+      async onCacheEntryAdded(args,
+                              {cacheDataLoaded, cacheEntryRemoved, updateCachedData},
+      ){
+        try {
+          await cacheDataLoaded;
+          connection.on("lookupReceived", (message: LookupMessage) => {
+            updateCachedData((draft) => {
+              let newMsg = draft.unshift(message);
+              draft.push(message);
+            })
+          })
+        } catch {
+
+        }
+      }
+    }),
+    userGetMeInfo: build.query<UserGetMeInfoApiResponse, UserGetMeInfoApiArg>({
+      query: () => ({ url: `/api/v1/user/me` }),
+    }),
     weatherGet: build.query<WeatherGetApiResponse, WeatherGetApiArg>({
       query: () => ({ url: `/api/v1/weather` }),
     }),
@@ -79,19 +110,11 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as webApi };
-export type LookupFollowUserApiResponse = unknown;
-export type LookupFollowUserApiArg = {
-  userToFollowId: string;
+export type LookupGetLookupApiResponse = /** status 200  */ LookupMessage;
+export type LookupGetLookupApiArg = {
+  id: string;
+  body: boolean;
 };
-export type LookupGetFollowersListApiResponse =
-  /** status 200  */ LookupMessage[];
-export type LookupGetFollowersListApiArg = void;
-export type LookupGetFollowingListApiResponse =
-  /** status 200  */ LookupMessage[];
-export type LookupGetFollowingListApiArg = void;
-export type LookupGetReceivedMessagesApiResponse =
-  /** status 200  */ LookupMessage[];
-export type LookupGetReceivedMessagesApiArg = void;
 export type LookupPostLookupApiResponse = unknown;
 export type LookupPostLookupApiArg = {
   createLookupModel: CreateLookupModel;
@@ -101,6 +124,37 @@ export type LookupEditLookupApiArg = {
   id: string;
   editLookupModel: EditLookupModel;
 };
+export type LookupGetMessagesFromUserApiResponse =
+  /** status 200  */ LookupMessage[];
+export type LookupGetMessagesFromUserApiArg = {
+  userId: string;
+};
+export type LookupGetMessageThreadApiResponse =
+  /** status 200  */ LookupMessage[];
+export type LookupGetMessageThreadApiArg = {
+  lookupId: string;
+};
+export type UserGetFollowersListApiResponse = /** status 200  */ User[];
+export type UserGetFollowersListApiArg = {
+  userId: string;
+};
+export type UserGetFollowingListApiResponse = /** status 200  */ User[];
+export type UserGetFollowingListApiArg = {
+  userId?: string;
+};
+export type UserGetUserInfoApiResponse = /** status 200  */ User;
+export type UserGetUserInfoApiArg = {
+  userId: string;
+};
+export type UserFollowUserApiResponse = unknown;
+export type UserFollowUserApiArg = {
+  userToFollowId: string;
+};
+export type UserGetReceivedMessagesApiResponse =
+  /** status 200  */ LookupMessage[];
+export type UserGetReceivedMessagesApiArg = void;
+export type UserGetMeInfoApiResponse = /** status 200  */ User;
+export type UserGetMeInfoApiArg = void;
 export type WeatherGetApiResponse = /** status 200  */ Weather;
 export type WeatherGetApiArg = void;
 export type LookupMessage = {
@@ -122,16 +176,32 @@ export type CreateLookupModel = {
 export type EditLookupModel = {
   content?: string;
 };
+export type User = {
+  username?: string;
+  avatarUrl?: string;
+  headerUrl?: string;
+  bio?: string;
+  location?: string;
+  joinedDate?: string;
+  followersCount?: number;
+  followingCount?: number;
+  lookupsCount?: number;
+};
 export type Weather = {
   id?: number;
   temp?: number;
 };
 export const {
-  useLookupFollowUserMutation,
-  useLookupGetFollowersListQuery,
-  useLookupGetFollowingListQuery,
-  useLookupGetReceivedMessagesQuery,
+  useLookupGetLookupQuery,
   useLookupPostLookupMutation,
   useLookupEditLookupMutation,
+  useLookupGetMessagesFromUserQuery,
+  useLookupGetMessageThreadQuery,
+  useUserGetFollowersListQuery,
+  useUserGetFollowingListQuery,
+  useUserGetUserInfoQuery,
+  useUserFollowUserMutation,
+  useUserGetReceivedMessagesQuery,
+  useUserGetMeInfoQuery,
   useWeatherGetQuery,
 } = injectedRtkApi;

@@ -1,4 +1,3 @@
-import React from 'react';
 import {SignInButton} from "../SignInButton";
 import {Container, Box, Content} from "./styles"
 

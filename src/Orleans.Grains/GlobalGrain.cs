@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using Domain;
+﻿using Domain;
 using Orleans.Concurrency;
 using Orleans.Interfaces;
 using Orleans.Runtime;
@@ -9,13 +8,7 @@ namespace Orleans.Grains;
 [Reentrant]
 public class GlobalGrain : Grain, IGlobalGrain
 {
-    
-    /*
-     *         [PersistentState(stateName: "account", storageName: "AccountState")]
-        IPersistentState<LookupAccountState> state,
-     */
     private readonly IPersistentState<GlobalGrainState> _state;
-
     public GlobalGrain([PersistentState(stateName: "global", storageName: "GlobalState")]
         IPersistentState<GlobalGrainState> state)
     {
@@ -28,6 +21,7 @@ public class GlobalGrain : Grain, IGlobalGrain
     {
         var lookups = new List<LookupMessage>();
         await Parallel.ForEachAsync(followingList,
+            new ParallelOptions { TaskScheduler = TaskScheduler.Current },
             async (id, _) =>
             {
                 var look = await GetLookupsFromUser(id);
@@ -38,7 +32,9 @@ public class GlobalGrain : Grain, IGlobalGrain
 
     public Task<List<LookupMessage>> GetLookupsFromUser(Guid id) => 
         Task.FromResult(_state.State.LookupMessages.Where(x => x.PublisherUserId == id).ToList());
-    
+
+    public Task<List<LookupMessage>> GetLookupThread(Guid lookupId) =>
+        Task.FromResult(_state.State.LookupMessages.Where(x => x.ReplyId == lookupId).ToList());
 
     public async Task<bool> AddLookupAsync(LookupMessage message)
     {
@@ -73,9 +69,15 @@ public class GlobalGrain : Grain, IGlobalGrain
         await WriteStateAsync();
     }
 
-    public Task<LookupMessage?> GetLookupMessage(Guid id) => 
-        Task.FromResult(_state.State.LookupMessages.FirstOrDefault(x => x.Id == id));
-    
+    public async Task<LookupMessage?> GetLookupMessage(Guid id, bool reply)
+    {
+        var messages = await Task.FromResult(reply ?
+            _state.State.LookupMessages.FirstOrDefault(x => x.ReplyId == id)
+            : _state.State.LookupMessages.FirstOrDefault(x => x.Id == id));
+
+        return messages;
+    }
+
 
     private async Task WriteStateAsync()
     {

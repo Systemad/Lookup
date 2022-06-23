@@ -1,18 +1,25 @@
-import React, { useRef, useEffect } from "react";
+import React, {useRef, useEffect, useState} from "react";
 
 import LookupItem from "./LookupItem";
 import { Flex, chakra, Spacer, Heading } from '@chakra-ui/react'
 import styled from "styled-components";
-import {useLookupGetReceivedMessagesQuery} from "../redux/webApi";
+import LookupItemDetail from "./LookupItemDetail";
+import {useUserGetReceivedMessagesQuery} from "../redux/webApi";
+import lookupItemDetail from "./LookupItemDetail";
 
-/*
-  content?: string;
-  timestamp?: string;
-  publisherUsername?: string;
- */
 const MainLookupFeed = () => {
     const messagesRef = useRef() as React.MutableRefObject<HTMLDivElement>;
-    const {data: messages, isLoading} = useLookupGetReceivedMessagesQuery();
+    const {data: messages, isLoading} = useUserGetReceivedMessagesQuery();
+    const [lookupDetail, setLookupDetail] = useState('')
+    const [lookupOpen, setLookupOpen] = useState(false);
+
+    const openLookup = (itemId: string): void => {
+        if(itemId !== null){
+            setLookupOpen(true);
+            setLookupDetail(itemId);
+            console.log(`Lookup clicked: ${itemId} - ${lookupOpen}`)
+        }
+    }
 
     useEffect(() => {
         const div = messagesRef.current;
@@ -25,20 +32,25 @@ const MainLookupFeed = () => {
 
     return (
         <>
-            <Flex justify="space-between" bg="var(--primary)">
+            <Flex justify="space-between">
                 <Flex flexDirection="column" w="55%" maxW="55%" maxH="100vh" overflowY="scroll" ref={messagesRef}>
-                    {messages?.map((message) => (
+                    {messages && messages.map((message) => (
                         <LookupItem
+                            key={message?.id}
                             author={message?.publisherUsername}
                             date={message?.timestamp}
                             likeCount={message?.likes}
+                            replyId={message?.replyId}
+                            onClick={() => openLookup(message.id!)}
                             content={message?.content}
-
                         />
-
                     ))}
-
                 </Flex>
+                {lookupOpen && lookupDetail !== '' &&
+                    <>
+                        <LookupItemDetail lookupId={lookupDetail} />
+                    </>
+                }
             </Flex>
         </>
     );

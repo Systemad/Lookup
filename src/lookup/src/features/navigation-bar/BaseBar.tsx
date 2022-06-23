@@ -1,19 +1,9 @@
 import * as React from "react";
-import {Box, Flex, Icon, Text, useDisclosure, Button, ButtonGroup} from "@chakra-ui/react";
-import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-    Textarea
-} from '@chakra-ui/react'
+import {Box, Flex, Text} from "@chakra-ui/react";
 import { AddIcon } from '@chakra-ui/icons'
-import {useLookupPostLookupMutation, CreateLookupModel} from "../redux/webApi";
 import NavBarItem from "./NavBarItem";
 import PostLookupItem from "./PostLookupItem";
+import ProfileButton from "./ProfileButton";
 
 const BaseBar = () => {
     return (
@@ -40,7 +30,8 @@ const BaseBar = () => {
             >
                 <PostLookupItem>Post Lookup</PostLookupItem>
                 <NavBarItem icon={AddIcon}>Home</NavBarItem>
-                <NavBarItem icon={AddIcon}>Profile</NavBarItem>
+                <NavBarItem icon={AddIcon}>Notifications</NavBarItem>
+                <ProfileButton/>
                 <NavBarItem icon={AddIcon}>About</NavBarItem>
             </Flex>
         </Box>

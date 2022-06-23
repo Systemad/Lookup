@@ -28,17 +28,3 @@ const NavBarItem = (iconProp: any) => {
 };
 
 export default NavBarItem;
-
-/*
-            {icon && (
-                <Icon
-                    mr="2"
-                    boxSize="4"
-                    _groupHover={{
-                        color: "gray.300",
-                    }}
-                    as={icon}
-                />
-            )}
-            {children}
- */

@@ -10,8 +10,13 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var connectionString = builder.Configuration["postgres"];
+
+//var endpointAddress = IPAddress.Parse(builder.Configuration["WEBSITE_PRIVATE_IP"]);
+//var strPorts = builder.Configuration["WEBSITE_PRIVATE_PORTS"].Split(',');
+//if (strPorts.Length < 2)
+//    throw new Exception("Insufficient private ports configured.");
+//var (siloPort, gatewayPort) = (int.Parse(strPorts[0]), int.Parse(strPorts[1]));
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -52,20 +57,24 @@ builder.Services.AddOpenApiServiceOath(builder.Configuration);
 //builder.Services.AddOrleans();
 builder.Host.UseOrleans((context, silobuilder) =>
 {
-    silobuilder.Configure<ClusterOptions>(options =>
-    {
-        options.ClusterId = "dev";
-        options.ServiceId = "lookupservice";
-    });
     if (context.HostingEnvironment.IsDevelopment())
     {
         silobuilder.UseLocalhostClustering();
-        silobuilder.AddMemoryGrainStorage("AccountState");
-        silobuilder.AddMemoryGrainStorage("GlobalState");
+        silobuilder.Configure<ClusterOptions>(options =>
+        {
+            options.ClusterId = "dev";
+            options.ServiceId = "lookupservice";
+        });
+        silobuilder.UseDashboard(); // Only use in development due being CPU intensive
     }
     else
     {
-        
+        //silobuilder.ConfigureEndpoints(endpointAddress, siloPort, gatewayPort);
+        silobuilder.Configure<ClusterOptions>(options =>
+        {
+            options.ClusterId = "dev";
+            options.ServiceId = "lookupservice";
+        });
         silobuilder.UseAdoNetClustering(opt =>
         {
             opt.Invariant = "Npgsql";
@@ -77,16 +86,12 @@ builder.Host.UseOrleans((context, silobuilder) =>
             opt.ConnectionString = connectionString;
         });
     }
-    silobuilder.Configure<EndpointOptions>(options =>
-    {
-        options.AdvertisedIPAddress = IPAddress.Loopback;
-    });
+    silobuilder.AddMemoryGrainStorage("AccountState");
+    silobuilder.AddMemoryGrainStorage("GlobalState");
     silobuilder.ConfigureLogging(
         log => log
             .AddFilter("Orleans.Runtime.Management.ManagementGrain", LogLevel.Warning)
             .AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning));
-    if(context.HostingEnvironment.IsDevelopment())
-        silobuilder.UseDashboard(); // Only use in development due being CPU intensive
 });
 
 var app = builder.Build();
