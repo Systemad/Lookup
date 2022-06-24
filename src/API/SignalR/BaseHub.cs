@@ -2,12 +2,14 @@
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Identity.Web.Resource;
 using Orleans;
 using Orleans.Interfaces;
 
 namespace API.SignalR;
 
 [Authorize]
+[RequiredScope("API.Access")]
 public class BaseHub : Hub
 {
     private readonly IGrainFactory _grainFactory;

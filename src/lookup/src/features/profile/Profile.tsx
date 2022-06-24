@@ -16,31 +16,8 @@ import {useLocation} from "react-router-dom";
 
 const ProfilePage: React.FC = () => {
 
-    const { instance, accounts, inProgress } = useMsal();
     const { pathname } = useLocation();
-    const  {data: user} = useUserGetUserInfoQuery({userId: pathname.toString()})
-
-    const tokenRequest = {
-        account: instance.getActiveAccount() as AccountInfo,
-        scopes: loginRequest.scopes
-    }
-
-    const accessTokenFactory = async () => {
-        const token = await instance.acquireTokenSilent(tokenRequest);
-        return token.accessToken;
-    }
-
-    const startConnection = async () => {
-        if(connection.state === signalR.HubConnectionState.Connected)
-            return;
-
-        if(connection.state === signalR.HubConnectionState.Disconnected)
-            await connection.start();
-    }
-
-    useEffect(() => {
-        startConnection().then(r => console.log(r));
-    }, []);
+    const {data: user} = useUserGetUserInfoQuery({userId: pathname.substring(1)})
 
     return (
         <>
@@ -48,7 +25,7 @@ const ProfilePage: React.FC = () => {
                 <ProfileBanner headerUrl={user?.headerUrl}/>
                 <Stack direction={['column', 'row']}>
                     <ProfileBio name={user?.username} bio={user?.bio} location={user?.location} joinedDate={user?.joinedDate}/>
-                    <ProfileLookups/>
+                    <ProfileLookups userId={pathname.substring(1)} />
                 </Stack>
             </Flex>
         </>

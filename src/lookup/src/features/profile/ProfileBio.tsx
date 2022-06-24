@@ -18,12 +18,13 @@ type Props = {
     joinedDate?: string,
     avatarUrl?: string
 }
-const ProfileBio = ({name, bio, occupation, location, joinedDate, avatarUrl} : Props) => {
+const ProfileBio = ({name, bio, location, joinedDate, avatarUrl} : Props) => {
     return (
             <Box
                 w="sm"
                 bg={useColorModeValue("white", "gray.800")}
                 overflow="hidden"
+                maxH="450px"
             >
                 <Image
                     w="full"
@@ -44,18 +45,6 @@ const ProfileBio = ({name, bio, occupation, location, joinedDate, avatarUrl} : P
                     <chakra.p py={2} color={useColorModeValue("gray.700", "gray.400")}>
                         {bio}
                     </chakra.p>
-
-                    <Flex
-                        alignItems="center"
-                        mt={4}
-                        color={useColorModeValue("gray.700", "gray.200")}
-                    >
-                        <Icon as={BsFillBriefcaseFill} h={6} w={6} mr={2} />
-
-                        <chakra.h1 px={2} fontSize="sm">
-                            TODO
-                        </chakra.h1>
-                    </Flex>
 
                     <Flex
                         alignItems="center"
@@ -85,3 +74,17 @@ const ProfileBio = ({name, bio, occupation, location, joinedDate, avatarUrl} : P
 }
 
 export default ProfileBio;
+
+/*
+                    <Flex
+                        alignItems="center"
+                        mt={4}
+                        color={useColorModeValue("gray.700", "gray.200")}
+                    >
+                        <Icon as={BsFillBriefcaseFill} h={6} w={6} mr={2} />
+
+                        <chakra.h1 px={2} fontSize="sm">
+                            TODO
+                        </chakra.h1>
+                    </Flex>
+ */

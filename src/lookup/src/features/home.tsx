@@ -20,18 +20,6 @@ const HomePage: React.FC = () => {
         return token.accessToken;
     }
 
-    const startConnection = async () => {
-        if(connection.state === signalR.HubConnectionState.Connected)
-            return;
-
-        if(connection.state === signalR.HubConnectionState.Disconnected)
-            await connection.start();
-    }
-
-    useEffect(() => {
-        startConnection().then(r => console.log(r));
-    }, []);
-
     return (
         <>
             <MainLookupFeed />

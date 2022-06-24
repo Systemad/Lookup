@@ -1,13 +1,30 @@
 import {
-    Box, Flex, Text,
+    Box, Button, Flex, Text,
     useColorModeValue,
 } from '@chakra-ui/react'
 import PostLookupItem from "./PostLookupItem";
 import NavBarItem from "./NavBarItem";
 import {AddIcon} from "@chakra-ui/icons";
 import * as React from "react";
+import {AccountInfo} from "@azure/msal-browser";
+import {loginRequest} from "../auth/utils/authConfig";
+import {useAccount, useMsal} from "@azure/msal-react";
+import {useEffect} from "react";
+import ProfileButton from "./ProfileButton";
+import {useNavigate} from "react-router-dom";
 
 export const NavigationBarComponent = () => {
+
+    const { instance, accounts, inProgress } = useMsal();
+    const account = useAccount(accounts[0] || {});
+    const tokenRequest = {
+        account: instance.getActiveAccount() as AccountInfo,
+        scopes: loginRequest.scopes
+    }
+
+    useEffect(() => {
+
+    },[instance, accounts, inProgress])
 
     return (
         <>
@@ -34,7 +51,7 @@ export const NavigationBarComponent = () => {
                         <PostLookupItem>Post Lookup</PostLookupItem>
                         <NavBarItem icon={AddIcon}>Home</NavBarItem>
                         <NavBarItem icon={AddIcon}>Notifications</NavBarItem>
-                        <NavBarItem icon={AddIcon}>Profile</NavBarItem>
+                        <ProfileButton userId={account!.localAccountId} />
                         <NavBarItem icon={AddIcon}>About</NavBarItem>
                     </Flex>
                 </Box>

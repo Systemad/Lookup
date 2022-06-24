@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/api/v1/lookup/{id}": {
+    "/api/v1/lookup/{id}/{reply}": {
       "get": {
         "tags": [
           "Lookup"
@@ -28,20 +28,17 @@
               "format": "guid"
             },
             "x-position": 1
+          },
+          {
+            "name": "reply",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "x-position": 2
           }
         ],
-        "requestBody": {
-          "x-name": "reply",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "boolean"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
         "responses": {
           "200": {
             "description": "",

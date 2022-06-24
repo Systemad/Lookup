@@ -12,7 +12,6 @@ const MainLookupFeed = () => {
     const {data: messages, isLoading} = useUserGetReceivedMessagesQuery();
     const [lookupDetail, setLookupDetail] = useState('')
     const [lookupOpen, setLookupOpen] = useState(false);
-
     const openLookup = (itemId: string): void => {
         if(itemId !== null){
             setLookupOpen(true);
@@ -34,10 +33,11 @@ const MainLookupFeed = () => {
         <>
             <Flex justify="space-between">
                 <Flex flexDirection="column" w="55%" maxW="55%" maxH="100vh" overflowY="scroll" ref={messagesRef}>
-                    {messages && messages.map((message) => (
+                    {messages && messages.filter(x => x.replyId === null).map((message) => (
                         <LookupItem
                             key={message?.id}
                             author={message?.publisherUsername}
+                            authorId={message?.publisherUserId}
                             date={message?.timestamp}
                             likeCount={message?.likes}
                             replyId={message?.replyId}

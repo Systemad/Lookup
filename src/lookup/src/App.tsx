@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import './App.css'
 // MSAL imports
 import {
@@ -23,6 +23,8 @@ type AppProps = {
 import HomePage from "./features/home";
 import ProfilePage from "./features/profile/Profile";
 import InteractionBar from "./features/interaction-sidebar";
+import connection from "./services/signalr";
+import * as signalR from "@microsoft/signalr";
 function App({pca} : AppProps) {
 
   const history = useNavigate();
@@ -45,6 +47,21 @@ export default App
 
 
 function Pages(){
+
+    const { instance, accounts, inProgress } = useMsal();
+
+    const startConnection = async () => {
+        if(connection.state === signalR.HubConnectionState.Connected)
+            return;
+
+        if(connection.state === signalR.HubConnectionState.Disconnected)
+            await connection.start();
+    }
+
+    useEffect(() => {
+        startConnection().then(r => console.log(r));
+    }, [accounts, instance]);
+
   return (
       <>
           <AuthenticatedTemplate>
@@ -67,7 +84,9 @@ function Pages(){
                       <Routes>
                           <Route path="/" element={<Navigate to="/home"/>}/>
                           <Route path="/home" element={<HomePage/>}/>
-                          <Route path="/profile" element={<ProfilePage/>}/>
+                          <Route path=":userId" element={<ProfilePage/>}>
+
+                          </Route>
                       </Routes>
                   </GridItem>
           </Grid>

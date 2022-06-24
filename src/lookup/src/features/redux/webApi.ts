@@ -7,8 +7,7 @@ const injectedRtkApi = api.injectEndpoints({
       LookupGetLookupApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/v1/lookup/${queryArg.id}`,
-        body: queryArg.body,
+        url: `/api/v1/lookup/${queryArg.id}/${queryArg.reply}`,
       }),
     }),
     lookupPostLookup: build.mutation<
@@ -38,6 +37,22 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/v1/lookup/${queryArg.userId}/messages`,
       }),
+      async onCacheEntryAdded(args,
+                              {cacheDataLoaded, cacheEntryRemoved, updateCachedData},
+      ){
+        try {
+          await cacheDataLoaded;
+          connection.on("lookupReceived", (message: LookupMessage) => {
+            if(message.publisherUserId !== args.userId) return;
+            updateCachedData((draft) => {
+              let newMsg = draft.unshift(message);
+              draft.push(message);
+            })
+          })
+        } catch {
+
+        }
+      }
     }),
     lookupGetMessageThread: build.query<
       LookupGetMessageThreadApiResponse,
@@ -46,6 +61,24 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/v1/lookup/${queryArg.lookupId}/thread`,
       }),
+      async onCacheEntryAdded(args,
+                              {cacheDataLoaded, cacheEntryRemoved, updateCachedData},
+      ){
+        try {
+          await cacheDataLoaded;
+          connection.on("lookupReceived", (message: LookupMessage) => {
+            console.log("lookupGetMessageThread");
+            const parentId = message.replyId;
+            if(parentId !== args.lookupId) return;
+            updateCachedData((draft) => {
+              let newMsg = draft.unshift(message);
+              draft.push(message);
+            })
+          })
+        } catch {
+
+        }
+      }
     }),
     userGetFollowersList: build.query<
       UserGetFollowersListApiResponse,
@@ -113,7 +146,7 @@ export { injectedRtkApi as webApi };
 export type LookupGetLookupApiResponse = /** status 200  */ LookupMessage;
 export type LookupGetLookupApiArg = {
   id: string;
-  body: boolean;
+  reply: boolean;
 };
 export type LookupPostLookupApiResponse = unknown;
 export type LookupPostLookupApiArg = {

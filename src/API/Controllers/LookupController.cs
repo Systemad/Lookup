@@ -25,9 +25,9 @@ public class LookupController : Controller
         _grainFactory = grainFactory;
     }
     
-    [HttpGet("{id:guid}", Name = "Get Lookup")]
+    [HttpGet("{id:guid}/{reply:bool}", Name = "Get Lookup")]
     [ProducesResponseType(typeof(LookupMessage), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> GetLookup([FromRoute] Guid id, [FromBody] bool reply)
+    public async Task<IActionResult> GetLookup([FromRoute] Guid id, [FromRoute] bool reply)
     {
         var globalGrain = _grainFactory.GetGrain<IGlobalGrain>(0);
         var lookup = await globalGrain.GetLookupMessage(id, reply);

@@ -16,7 +16,7 @@ type Props = {
 const LookupItemDetail = ({lookupId} : Props) => {
     let [value, setValue] = React.useState('')
     const [sendLookup] = useLookupPostLookupMutation();
-    const {data: lookupItem} = useLookupGetLookupQuery({id: lookupId, body: false});
+    const {data: lookupItem} = useLookupGetLookupQuery({id: lookupId, reply: false});
     const {data: lookupThread} = useLookupGetMessageThreadQuery({lookupId: lookupId});
 
     let handleInputChange = (e: any) => {
